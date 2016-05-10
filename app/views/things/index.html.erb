@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+
+  </head>
+
+  <body>
+  <div id="map1">    </div>
+
+  <script>
+  var thing1 = {name: '<%= Thing.first.name%>', description: '<%=Thing.first.description%>', latitude: '<%=Thing.first.latitude%>', longitude: '<%=Thing.first.longitude %>'};
+  var latlong1 = {lat: <%=Thing.first.latitude%>, lng: <%=Thing.first.longitude%>};
+  function initMap() {
+    var mapOptions = {
+      center: {lat: 43.667, lng: -79.390},
+      zoom: 13,
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+    };
+
+  var map1 = new google.maps.Map(document.getElementById('map1'), mapOptions);
+
+  var marker = new google.maps.Marker({
+    position: latlong1,
+    map: map1
+  });
+
+  marker.setmap(map1);
+  }
+
+</script>
+
+
+  </body>
+
+</html>

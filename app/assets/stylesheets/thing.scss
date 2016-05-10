@@ -1,0 +1,46 @@
+// Place all the styles related to the thing controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+html,body {
+  box-sizing: border-box;
+  margin: 0;
+  font-size: 16px;
+  font-family: helvetica, arial, monospace;
+  height: 100%;
+  width: 100%;
+  margin: auto;
+}
+
+header {
+  height: 5rem;
+  background-color: #eee;
+}
+h1 {
+  font-size: 2rem;
+  margin-top: 0;
+}
+div#map1 {
+  top: 50px;
+  margin: auto;
+  width: 70%;
+  height: 50%;
+  border: 3px solid pink;
+  border-radius: 10px;
+}
+
+div#map2 {
+  margin-top: 50px;
+  margin: auto;
+  width: 70%;
+  height: 50%;
+  border: 3px solid orange;
+  border-radius: 10px;
+}
+
+#autocomplete {
+  margin-top: 100px;
+  margin-left: 50px;
+  width: 50%;
+  height: 25px;
+}

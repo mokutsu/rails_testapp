@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <script src="https://maps.googleapis.com/maps/api/js?key=<%=ENV['google_maps_api_key']%>&libraries=drawing,geometry,places&callback=initMap"
+    async defer></script>
+  </head>
+
+  <body>
+    <div id="map1">    </div>
+    <input type="text" id="autocomplete">
+    <div id = 'list'> List of places </div>
+    <script>
+    new_array = [];
+    function initMap() {
+
+      var mapOptions = {
+        center: {lat: 43.667, lng: -79.390},
+        zoom: 13,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+      };
+
+      var map1 = new google.maps.Map(document.getElementById('map1'), mapOptions);
+      var acOptions = {
+        // types: ['establishment']
+      };
+      var autocomplete1 = new google.maps.places.Autocomplete(document.getElementById('autocomplete'),acOptions);
+
+      autocomplete1.bindTo('bounds',map1);
+      var infoWindow2 = new google.maps.InfoWindow();
+      var marker2AC = new google.maps.Marker({
+        map: map1
+      });
+
+      google.maps.event.addListener(autocomplete1, 'place_changed', function() {
+        infoWindow2.close();
+        var place = autocomplete1.getPlace();
+        new_array.push(place); //store in json and ajax instead (alternative)
+        $('#list').append('<div> place name:  '+place.name+'place address: '+place.formatted_address+'</div>') //add to hidden element in form
+        $('input#thing_name').attr('value',new_array[0].name);
+        $('input#thing_description').attr('value',new_array[0].formatted_address);
+
+        marker2AC.setPosition(place.geometry.location);
+
+        infoWindow2.setContent('<div><strong>' + place.name + '</strong><br>');
+        infoWindow2.open(map1, marker2AC);
+
+        google.maps.event.addListener(marker2AC,'click',function(e){
+          marker2AC = null;
+        });
+
+      });
+
+    };
+
+  </script>
+
+  <br><br>
+  params [addresses].each do <-- in controller, in create action
+  thing.create <-- in controller
+
+    <%= form_for @thing do |f| %>
+    hidden field with address (array) per waypoint
+      <%= f.label :name %>
+      <%= f.text_field :name %>
+      <%= f.label :description %>
+      <%= f.text_field :description %>
+      <%= f.submit %>
+    <% end %>
+
+    </body>
+</html>
