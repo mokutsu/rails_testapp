@@ -1,70 +1,156 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Simple Map</title>
-    <meta name="viewport" content="initial-scale=1.0">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <script src="https://maps.googleapis.com/maps/api/js?key=<%=ENV['google_maps_api_key']%>&libraries=drawing,geometry,places&callback=initMap"
-    async defer></script>
+    <title>Waypoints in directions</title>
+    <style>
+      #right-panel {
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+
+      #right-panel select, #right-panel input {
+        font-size: 15px;
+      }
+
+      #right-panel select {
+        width: 100%;
+      }
+
+      #right-panel i {
+        font-size: 12px;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+        float: left;
+        width: 70%;
+        height: 100%;
+      }
+      #right-panel {
+        margin: 20px;
+        border-width: 2px;
+        width: 20%;
+        float: left;
+        text-align: left;
+        padding-top: 20px;
+      }
+      #directions-panel {
+        margin-top: 20px;
+        background-color: #FFEE77;
+        padding: 10px;
+      }
+    </style>
   </head>
-
   <body>
-    <div id="map1">    </div>
-    <input type="text" id="autocomplete">
-    <div id = 'list'> List of places </div>
+    <div id="map"></div>
+    <div id="right-panel">
+    <div>
+    <b>Start:</b>
+    <select id="start">
+      <option value="Halifax, NS">Halifax, NS</option>
+      <option value="Boston, MA">Boston, MA</option>
+    </select>
+    <br>
+    <b>Waypoints:</b> <br>
+    <i>(Ctrl-Click for multiple selection)</i> <br>
+    <select multiple id="waypoints">
+      <option value="montreal, quebec">Montreal, QBC</option>
+      <option value="toronto, ont">Toronto, ONT</option>
+      <option value="spokane, wa">Spokane</option>
+    </select>
+    <br>
+    <b>End:</b>
+    <select id="end">
+      <option value="Vancouver, BC">Vancouver, BC</option>
+      <option value="Los Angeles, CA">Los Angeles, CA</option>
+    </select>
+    <br>
+      <input type="submit" id="submit">
+    </div>
+    <div id="directions-panel"></div>
+    </div>
     <script>
-    new_array = [];
-    function initMap() {
+    //1. initMap function is called, which instantiates 2 vars below and map obj
+      function initMap() {
+        var directionsService = new google.maps.DirectionsService; // geocode and calculate direction between pts
+        var directionsDisplay = new google.maps.DirectionsRenderer; // creates an empty rendering object, which will later be used to show pts, paths
 
-      var mapOptions = {
-        center: {lat: 43.667, lng: -79.390},
-        zoom: 13,
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-      };
 
-      var map1 = new google.maps.Map(document.getElementById('map1'), mapOptions);
-      var acOptions = {
-        // types: ['establishment']
-      };
-      var autocomplete1 = new google.maps.places.Autocomplete(document.getElementById('autocomplete'),acOptions);
-
-      autocomplete1.bindTo('bounds',map1);
-      var infoWindow2 = new google.maps.InfoWindow();
-      var marker2AC = new google.maps.Marker({
-        map: map1
-      });
-
-      google.maps.event.addListener(autocomplete1, 'place_changed', function() {
-        infoWindow2.close();
-        var place = autocomplete1.getPlace();
-        new_array.push(place);
-        $('#list').append('<div> place name:  '+place.name+'place address: '+place.formatted_address+'</div>')
-        $('input#thing_name').attr('value',new_array[0].name);
-        $('input#thing_description').attr('value',new_array[0].formatted_address);
-
-        marker2AC.setPosition(place.geometry.location);
-
-        infoWindow2.setContent('<div><strong>' + place.name + '</strong><br>');
-        infoWindow2.open(map1, marker2AC);
-
-        google.maps.event.addListener(marker2AC,'click',function(e){
-          marker2AC = null;
+        // *******REPLACE THIS FUNCTION BELOW WITH A CALLBACK TO OUR MapInit Function ******** //
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 6,
+          center: {lat: 41.85, lng: -87.65}
         });
+//**************TO HERE ***************//
 
-      });
+        directionsDisplay.setMap(map); // var directionsDisplay is tied to map
+    //on submit click, execute function, CalculateandDisplayRoute with 2 input variables: directionsService object, and directionsDisplay object
 
-    };
+// ******** REMOVE event listener for submit button. Replace with 'on page load, where URL matches show pattern ***********// '
+        document.getElementById('submit').addEventListener('click', function() {
+          calculateAndDisplayRoute(directionsService, directionsDisplay);
+        });
+      }
+//***********************//
 
-  </script>
 
-  <br><br>
-    <%= form_for @thing do |f| %>
-      <%= f.label :name %>
-      <%= f.text_field :name %>
-      <%= f.label :description %>
-      <%= f.text_field :description %>
-      <%= f.submit %>
-    <% end %>
+//on click submit, execute function below with 2 inputs:
+  function calculateAndDisplayRoute(directionsService, directionsDisplay) {
 
-    </body>
+    //chunk below iterates over input menu on htmlpage and plucks out selected waypoints, pushing into waypts array
+    var waypts = []; // ***** This should equal our waypoints Array (take first and last out) ********
+
+    // var checkboxArray = document.getElementById('waypoints');
+    // for (var i = 0; i < checkboxArray.length; i++) {
+    //   if (checkboxArray.options[i].selected) {
+    //     waypts.push({
+    //       location: checkboxArray[i].value,
+    //       stopover: true
+    //     });
+    //   }
+    }
+
+    //call .route method on directionsService object. inputs: 1 hash, 1 success-callback function
+    directionsService.route({
+      origin: document.getElementById('start').value, //****Waypoints.first
+      destination: document.getElementById('end').value, //****waypoints.last
+      waypoints: waypts, // *****Waypoints between first and last
+      optimizeWaypoints: true, // leave for now
+      travelMode: google.maps.TravelMode.DRIVING //******** .WALKING
+    }, function(response, status) { // response, status are returned from .route method
+
+      //if successful directionsService request
+      if (status === google.maps.DirectionsStatus.OK) {
+        directionsDisplay.setDirections(response); //call setDirections method on input variable, directionsDisplay (a google object, 'renderer'), feeding it 'response' (contains waypoints, paths from directionsService.route)
+        var route = response.routes[0]; //returns all info between a-->b and b-->c etc. (each leg of journey)
+        var summaryPanel = document.getElementById('directions-panel'); //stores DOM element, 'directions-panel' in variable
+
+        //******SET NEW DIV ID FOR DIRECTIONS  in VIEW ********//
+        summaryPanel.innerHTML = '';//sets html of summaryPanel to blank
+        // For each leg of route, display summary information.
+        for (var i = 0; i < route.legs.length; i++) {
+          var routeSegment = i + 1;
+          summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
+              '</b><br>';
+          summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+          summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+          summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+        } // ***** CHANGE TEXT HERE TO PROVIDE DIRECTIONS ********//
+      } else { // if response status is not ok
+        window.alert('Directions request failed due to ' + status);
+      }
+    });
+
+  }
+    </script>
+    <script> initMap();  //******RENAME AND DIFFERENTIATE FROM OUR FUNCTION ****//
+    </script>
+  </body>
 </html>
